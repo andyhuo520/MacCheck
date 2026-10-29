@@ -144,7 +144,7 @@ struct InfoRow: View {
         HStack(alignment: .top) {
             Text(key).font(DS.Font.body).foregroundStyle(.secondary)
             Spacer(minLength: DS.Spacing.lg)
-            Text(value).font(mono ? DS.Font.mono : DS.Font.body)
+            Text(value).font(mono ? DS.Font.body.monospaced() : DS.Font.body)
                 .multilineTextAlignment(.trailing)
                 .textSelection(.enabled)
         }

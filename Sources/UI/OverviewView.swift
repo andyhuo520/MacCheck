@@ -171,7 +171,12 @@ struct OverviewView: View {
                 Image(systemName: item.icon).frame(width: 22).foregroundStyle(.tint)
                 Text(item.title).font(DS.Font.bodyEmphasis)
                 Spacer()
-                if let status = model.status(for: item) {
+                if item == .specs {
+                    Text(hardwareSpecsSummary)
+                        .font(DS.Font.caption).foregroundStyle(.secondary)
+                        .lineLimit(1).truncationMode(.tail).frame(maxWidth: 320, alignment: .trailing)
+                    Image(systemName: "chevron.right").font(.system(size: 10)).foregroundStyle(.tertiary)
+                } else if let status = model.status(for: item) {
                     Text(model.results(for: item).first?.summary ?? status.label)
                         .font(DS.Font.caption).foregroundStyle(.secondary)
                         .lineLimit(1).truncationMode(.tail).frame(maxWidth: 320, alignment: .trailing)
@@ -185,6 +190,23 @@ struct OverviewView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    private var hardwareSpecsSummary: String {
+        guard let profile = model.profile else {
+            return model.isScanning ? L("正在读取硬件信息…", "Reading hardware info…") : L("查看硬件详情", "View hardware details")
+        }
+        let chip = profile.chip.trimmingCharacters(in: .whitespacesAndNewlines)
+        let memory = profile.memory.trimmingCharacters(in: .whitespacesAndNewlines)
+        let storageDetails = model.result(id: "storage")?.rawDetails ?? [:]
+        let capacity = (storageDetails["容量"] ?? storageDetails["Capacity"] ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let parts = [
+            chip,
+            memory.isEmpty ? "" : L("\(memory) 内存", "\(memory) memory"),
+            capacity.isEmpty ? "" : L("\(capacity) 磁盘", "\(capacity) storage"),
+        ].filter { !$0.isEmpty }
+        return parts.isEmpty ? L("查看硬件详情", "View hardware details") : parts.joined(separator: " · ")
     }
 
     // MARK: - 底部

@@ -5,23 +5,27 @@ struct SidebarView: View {
     @EnvironmentObject private var model: AppModel
 
     var body: some View {
-        List(selection: $model.selection) {
-            row(.overview)
-            row(.history)
-            row(.settings)
+        VStack(spacing: 0) {
+            List(selection: $model.selection) {
+                row(.overview)
+                row(.history)
+                row(.settings)
 
-            Section(L("系统检测", "System Checks")) {
-                ForEach(SidebarItem.autoCategories) { row($0) }
-                row(.aiModels)
-            }
+                Section(L("系统检测", "System Checks")) {
+                    ForEach(SidebarItem.autoCategories) { row($0) }
+                    row(.aiModels)
+                }
 
-            Section(L("硬件测试", "Hardware Tests")) {
-                ForEach(SidebarItem.interactiveTests) { row($0) }
+                Section(L("硬件测试", "Hardware Tests")) {
+                    ForEach(SidebarItem.interactiveTests) { row($0) }
+                }
             }
+            .listStyle(.sidebar)
+
+            rescanBar
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .listStyle(.sidebar)
         .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 280)
-        .safeAreaInset(edge: .bottom) { rescanBar }
     }
 
     private func row(_ item: SidebarItem) -> some View {

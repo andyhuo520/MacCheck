@@ -80,9 +80,18 @@ struct SpecsView: View {
                 KVRow(icon: "tag", key: L("型号标识", "Model identifier"), value: p.modelIdentifier, mono: true)
                 KVRow(icon: "cpu", key: L("芯片", "Chip"), value: p.chip)
                 KVRow(icon: "memorychip", key: L("内存", "Memory"), value: p.memory)
+                KVRow(icon: "internaldrive", key: L("磁盘容量", "Disk capacity"), value: diskCapacity)
                 KVRow(icon: "square.stack.3d.up", key: L("架构", "Architecture"), value: p.architecture, last: true)
             }
         }
+    }
+
+    private var diskCapacity: String {
+        let details = model.result(id: "storage")?.rawDetails ?? [:]
+        let capacity = (details["容量"] ?? details["Capacity"] ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !capacity.isEmpty { return capacity }
+        return model.isScanning ? L("正在读取…", "Reading…") : L("未能读取", "Unavailable")
     }
 
     // 系统
@@ -182,7 +191,7 @@ struct KVRow: View {
                 Text(key).font(DS.Font.body).foregroundStyle(.secondary)
                 Spacer(minLength: DS.Spacing.lg)
                 Text(value)
-                    .font(mono ? DS.Font.mono : DS.Font.body)
+                    .font(mono ? DS.Font.body.monospaced() : DS.Font.body)
                     .foregroundStyle(valueTint ?? .primary)
                     .multilineTextAlignment(.trailing)
                     .textSelection(.enabled)
